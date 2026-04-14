@@ -21,14 +21,21 @@ function stripDriveNamePrefixes(value) {
   }
 
   const prefixes = [
-    /^Google Drive shortcut\s*:\s*/i,
-    /^shortcut\s*:\s*/i,
-    /^Shortcut to\s+/i,
-    /^Google Drive folder\s*:\s*/i,
-    /^Google Drive file\s*:\s*/i
+    /^Google\s+Drive\s+shortcut(?:\s+to)?\s*[:：-]?\s*/i,
+    /^shortcut(?:\s+to)?\s*[:：-]?\s*/i,
+    /^Google\s+Drive\s+folder\s*[:：-]?\s*/i,
+    /^Google\s+Drive\s+file\s*[:：-]?\s*/i,
+    /^folder\s*[:：-]?\s*/i,
+    /^file\s*[:：-]?\s*/i
   ];
 
-  return prefixes.reduce((acc, pattern) => acc.replace(pattern, ''), normalized).trim();
+  const stripped = prefixes.reduce((acc, pattern) => acc.replace(pattern, ''), normalized).trim();
+  if (stripped) {
+    return stripped;
+  }
+
+  // Last-resort cleanup if labels include "Google Drive shortcut" without consistent punctuation.
+  return normalized.replace(/google\s+drive\s+shortcut/gi, '').replace(/^[:：-]\s*/, '').trim();
 }
 
 function cleanName(value) {
